@@ -945,6 +945,16 @@ if (!hasGeminiKey() && !localStorage.getItem('studioSetupSeen')) {
 
 // ── FIRST LOAD ───────────────────────────────────────────────
 loadFromStorage();
+
+// 🗑️ AUTO-CLEANUP: Remove news older than 48 hours (2 days)
+const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+const now = Date.now();
+allArticles = allArticles.filter(a => {
+  const pubDate = new Date(a.pubDate).getTime();
+  return (now - pubDate) < TWO_DAYS_MS;
+});
+saveToStorage();
+
 loadAllFeeds(true); // Initial load with spinner
 setInterval(() => loadAllFeeds(false), 2 * 60 * 1000); // 2-Minute Market Pulse (Shadow Scan)
 updateEngineDisplay();
