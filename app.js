@@ -240,16 +240,37 @@ function buildSummary(description) {
 // ── FETCH — with multi-proxy fallback ───────────────────────
 async function fetchWithProxy(url) {
   const shuffled = [...PROXIES].sort(() => Math.random() - 0.5);
-  for (const proxyFn of shuffled) {
-    try {
+  const raceCount = 3; // Race top 3 for maximum speed
+  const controller = new AbortController();
+  
+  const race = shuffled.slice(0, raceCount).map(proxyFn => {
+    return (async () => {
       const separator = url.includes('?') ? '&' : '?';
-      const cacheBustedUrl = `${url}${separator}live_radar_v5=${Date.now()}`;
-      // Reduced timeout to 4000ms for faster fallback
-      const res = await fetch(proxyFn(cacheBustedUrl), { signal: AbortSignal.timeout(4000) });
-      if (!res.ok) continue;
+      const cacheBustedUrl = `${url}${separator}live_radar_v6=${Date.now()}`;
+      const res = await fetch(proxyFn(cacheBustedUrl), { signal: controller.signal });
+      if (!res.ok) throw new Error('Proxy fail');
       const text = await res.text();
-      if (text && text.length > 200) return text; 
-    } catch (_) {}
+      if (text && text.length > 200) {
+        controller.abort(); // Cancel the other racing requests
+        return text;
+      }
+      throw new Error('Response invalid');
+    })();
+  });
+
+  try {
+    return await Promise.any(race);
+  } catch (e) {
+    // Fallback: try the rest one-by-one if the race failed
+    for (const proxyFn of shuffled.slice(raceCount)) {
+      try {
+        const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(3000) });
+        if (res.ok) {
+          const text = await res.text();
+          if (text && text.length > 200) return text;
+        }
+      } catch (_) {}
+    }
   }
   throw new Error('All satellites blocked.');
 }
@@ -270,8 +291,8 @@ async function fetchFeed(source) {
 }
 
 async function loadAllFeeds(isInitial = false) {
-  const needsLoading = isInitial && allArticles.length === 0;
-  if (needsLoading) {
+  // Only show full-screen spinner if the app is totally empty
+  if (allArticles.length === 0) {
     loadingState.style.display = 'flex';
     newsGrid.style.display     = 'none';
   }
@@ -279,43 +300,55 @@ async function loadAllFeeds(isInitial = false) {
   lastUpdated.innerHTML    = '<span class="radar-scan"></span> Background Sync Active...';
   lastUpdated.style.color    = '#0abfbc';
 
-  // Optimized: Parallel fetch for massive speed increase
-  // We use Promise.allSettled to ensure one failing source doesn't block the rest
-  const results = await Promise.allSettled(SOURCES.map(s => fetchFeed(s)));
-  
   let successCount = 0;
-  results.forEach((res, index) => {
-    const s = SOURCES[index];
-    if (res.status === 'fulfilled') {
-      const feedItems = res.value;
+  let processedSourceCount = 0;
+
+  // Optimized: Incremental rendering — Update UI for EACH source as it completes
+  SOURCES.forEach(async (s) => {
+    try {
+      const feedItems = await fetchFeed(s);
+      let addedAny = false;
       feedItems.forEach(item => {
         const exists = allArticles.some(ex => ex.link === item.link || (ex.title === item.title && ex.source === item.source));
         if (!exists) {
           const score = scoreArticle(item, s.cat);
           Object.assign(item, score); 
           allArticles.unshift(item);
+          addedAny = true;
         }
       });
       successCount++;
       sourceStatuses[s.name] = 'online';
-    } else {
-      console.warn(`Failed: ${s.name}`, res.reason);
+
+      // Immediate UI Update if new news found
+      if (addedAny || isInitial) {
+        allArticles.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
+        allArticles = allArticles.slice(0, 2000);
+        saveToStorage();
+        
+        // Hide spinner as soon as we have data
+        loadingState.style.display = 'none';
+        newsGrid.style.display     = 'grid';
+        
+        applyFiltersAndRender();
+        renderTicker();
+        renderRightPanel();
+      }
+    } catch (e) {
+      console.warn(`Failed: ${s.name}`, e);
       sourceStatuses[s.name] = 'error';
+    } finally {
+      processedSourceCount++;
+      if (processedSourceCount === SOURCES.length) {
+        finishScan(successCount);
+      }
     }
   });
+}
 
-  allArticles = allArticles.slice(0, 2000);
-  saveToStorage();
-
-  loadingState.style.display = 'none';
-  newsGrid.style.display     = 'grid';
-  errorState.style.display   = 'none';
+function finishScan(successCount) {
   updateStats(allArticles, successCount);
   renderSourceList();
-  renderTicker();
-  renderRightPanel();
-  applyFiltersAndRender();
-
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-AE', { hour:'2-digit', minute:'2-digit' });
   lastUpdated.innerHTML = `<span class="radar-scan"></span> All Satellites Green (${timeStr})`;
@@ -954,6 +987,11 @@ if (!hasGeminiKey() && !localStorage.getItem('studioSetupSeen')) {
 
 // ── FIRST LOAD ───────────────────────────────────────────────
 loadFromStorage();
+if (allArticles.length > 0) {
+  applyFiltersAndRender();
+  renderTicker();
+  renderRightPanel();
+}
 
 // 🗑️ AUTO-CLEANUP: Remove news older than 48 hours (2 days)
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
