@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ELITE — Intelligence & Power Hub</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Oswald:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+/* === DESIGN SYSTEM: THE OBSIDIAN & GOLD === */
+:root {
+  --bg-dark: #05070a; --bg-glass: rgba(10, 14, 23, 0.9); --bg-card: #0f131a;
+  --gold: #d4af37; --gold-dark: #aa8d2d; --gold-glow: rgba(212, 175, 55, 0.1);
+  --ai-blue: #0ea5e9; --power-red: #ef4444; --biz-green: #22c55e;
+  --text-main: #f0f4ff; --text-muted: #8d9bb5; --text-dim: #4a5568;
+  --border: rgba(255, 255, 255, 0.05); --border-focus: rgba(212, 175, 55, 0.3);
+  --radius: 12px; --trans: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main);
+  min-height: 100vh; overflow-x: hidden; line-height: 1.6;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 10px; }
+
+/* === HEADER === */
+.header {
+  position: sticky; top: 0; z-index: 1000; background: var(--bg-glass);
+  backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); padding: 0 32px;
+  height: 80px; display: flex; align-items: center; justify-content: space-between;
+}
+.brand { display: flex; align-items: center; gap: 16px; }
+.brand-name { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 800; color: var(--gold); letter-spacing: 2px; }
+.brand-tag { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 4px; display: block; }
+
+.status-bar { display: flex; align-items: center; gap: 24px; }
+.radar-orb { width: 10px; height: 10px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; display: inline-block; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); } 70% { box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
+.live-intel { font-size: 11px; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
+
+/* === TICKER === */
+.power-ticker {
+  height: 40px; background: #000; display: flex; align-items: center;
+  border-bottom: 1px solid var(--gold-glow); overflow: hidden;
+}
+.label { background: var(--gold); color: #000; padding: 0 20px; font-weight: 800; font-size: 11px; height: 100%; display: flex; align-items: center; flex-shrink: 0; letter-spacing: 1.5px; }
+.ticker-content { display: inline-block; white-space: nowrap; animation: scroll 60s linear infinite; padding-left: 100%; font-size: 13px; color: var(--gold); font-weight: 600; }
+@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+
+/* === LAYOUT === */
+.container { max-width: 1700px; margin: 32px auto; padding: 0 32px; display: grid; grid-template-columns: 280px 1fr 340px; gap: 32px; }
+
+/* === SIDEBAR === */
+.sidebar-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+.section-title { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-bottom: 1px solid var(--gold-glow); padding-bottom: 8px; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 8px;
+  color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 14px;
+  cursor: pointer; transition: var(--trans); border: 1px solid transparent;
+}
+.nav-item:hover, .nav-item.active { background: var(--gold-glow); color: var(--gold); border-color: var(--border-focus); transform: translateX(5px); }
+.nav-count { margin-left: auto; font-size: 10px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 99px; }
+
+/* === NEWS CARDS === */
+.news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px; }
+.card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  overflow: hidden; cursor: pointer; transition: var(--trans); position: relative;
+}
+.card:hover { transform: translateY(-5px); border-color: var(--gold-dark); box-shadow: 0 10px 40px rgba(0,0,0,0.6), var(--gold-glow); }
+.card-header { height: 4px; background: var(--gold-dark); }
+.card-content { padding: 24px; }
+.card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: 11px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+.card-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.3; margin-bottom: 12px; color: var(--text-main); }
+.card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3; overflow: hidden; }
+
+/* === RIGHT PANEL === */
+.power-card { background: linear-gradient(135deg, #1a1505, #0a0e17); border: 1px solid var(--gold-dark); border-radius: var(--radius); padding: 24px; }
+.quote { font-family: 'Cinzel', serif; font-size: 18px; line-height: 1.4; color: var(--gold); font-style: italic; margin-bottom: 12px; }
+.author { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+
+/* === SATELLITE COMMAND PANEL (SYNC WITH KT) === */
+.sat-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px;
+  background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 8px;
+  border: 1px solid transparent; transition: var(--trans);
+}
+.sat-item:hover { background: rgba(212, 175, 55, 0.05); border-color: var(--gold-glow); }
+.sat-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.sat-dot.green { background: #10b981; box-shadow: 0 0 10px #10b981; }
+.sat-dot.red { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+.sat-dot.gray { background: #4a5568; }
+.sat-name { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+@media (max-width: 1200px) { .container { grid-template-columns: 1fr; } .sidebar, .right-sidebar { display: none; } }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <header class="header">
+        <div class="brand">
+            <span class="brand-name">THE ELITE</span>
+            <span class="brand-tag">Intelligence • Power • Empire</span>
+        </div>
+        <div class="status-bar">
+            <div id="lastUpdated" class="live-intel"><span class="radar-orb"></span> LIVE INTEL SCAN</div>
+            <button onclick="loadAllFeeds()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size:11px; letter-spacing:1px;">FORCE REFRESH</button>
+        </div>
+    </header>
+
+    <div class="power-ticker">
+        <div class="label">EMPIRE PULSE</div>
+        <div id="ticker" class="ticker-content">Initializing Military-Grade AI Scanners... Fetching elite scaling dispatches... Authenticating high-performance mindset wires...</div>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="section-title">COMMAND CHANNELS</h3>
+                <nav>
+                    <div class="nav-item active" data-filter="all">🌐 GLOBAL HUB <span class="nav-count" id="count-all">0</span></div>
+                    <div class="nav-item" data-filter="ai-scale">🤖 AI AGENCY SCALE <span class="nav-count" id="count-ai">0</span></div>
+                    <div class="nav-item" data-filter="biz-scaling">🚀 EMPIRE BUILDING <span class="nav-count" id="count-biz">0</span></div>
+                    <div class="nav-item" data-filter="mindset">🧠 POWER & MINDSET <span class="nav-count" id="count-mind">0</span></div>
+                    <div class="nav-item" data-filter="ai-toolbox">🛠️ THE TOOL BOX <span class="nav-count" id="count-tools">0</span></div>
+                </nav>
+            </div>
+            
+            <div class="sidebar-section" style="background: var(--gold-glow);">
+                <h3 class="section-title">DAILY LAW</h3>
+                <div id="dailyLaw" style="font-size: 13px; color: var(--gold); font-weight:700; line-height:1.5;">Thinking...</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1 id="viewTitle" style="font-family:'Oswald'; letter-spacing:2px; margin-bottom:24px; border-left:4px solid var(--gold); padding-left:16px;">THE INTELLIGENCE VAULT</h1>
+            <div id="loading" style="text-align:center; padding:50px; color:var(--gold);">[ ACCESSING SATELLITE NETWORK... ]</div>
+            <div id="newsGrid" class="news-grid" style="display:none;"></div>
+        </main>
+
+        <!-- Right Insights -->
+        <aside class="right-sidebar">
+            <div class="power-card">
+                <h3 class="section-title">STRATEGIC COUNSEL</h3>
+                <div class="quote" id="powerQuote">"He who has a why to live can bear almost any how."</div>
+                <div class="author">— Friedrich Nietzsche</div>
+            </div>
+            
+            <div class="sidebar-section" style="margin-top:24px;">
+                <h3 class="section-title">SATELLITE STATUS</h3>
+                <div id="satStatus" style="font-size:11px; color:var(--text-dim); display:flex; flex-direction:column; gap:8px;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+const PROXIES = [
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  url => `https://thingproxy.freeboard.io/fetch/${url}`,
+  url => `https://proxy.cors.sh/${url}`,
+  url => `https://cors-anywhere.herokuapp.com/${url}`,
+  url => `https://yproxy.io/proxy/${url}`,
+  url => `https://serverless-cors-proxy.vercel.app/api/proxy?url=${encodeURIComponent(url)}`
+];
+
+const SOURCES = [
+  // 🤖 AI AGENCY & SCALE (Scaling Playbooks & Profit)
+  { name: 'AI Agency Scaling Lab', url: 'https://news.google.com/rss/search?q=when:7D+"Scale+AI+Agency"+OR+"AI+Sales+Automation"+OR+"Agentic+Breakthrough"&hl=en-US&gl=US&ceid=US:en', label: 'PLAYBOOK', cat: 'ai-scale' },
+  { name: 'The Decoder (Elite AI)', url: 'https://the-decoder.com/feed/', label: 'AI INTEL', cat: 'ai-scale' },
+  { name: 'AI Business Scale Radar', url: 'https://news.google.com/rss/search?q=when:7D+AI+startup+agency+scaling+revenue+playbook&hl=en-US&gl=US&ceid=US:en', label: 'AGENCY', cat: 'ai-scale' },
+  { name: 'AI Breakthroughs (Deep)', url: 'https://news.google.com/rss/search?q=when:7D+source:Technology_Review+AI+breakthrough&hl=en-US&gl=US&ceid=US:en', label: 'KNOWLEDGE', cat: 'ai-scale' },
+  { name: 'Emergent AI Logic (Res)', url: 'https://news.google.com/rss/search?q=when:30D+source:ArXiv+AI+Agent+Scaling+Law&hl=en-US&gl=US&ceid=US:en', label: 'RESEARCH', cat: 'ai-scale' },
+  { name: 'VentureBeat AI Growth', url: 'https://venturebeat.com/category/ai/feed/', label: 'GROWTH', cat: 'ai-scale' },
+  
+  // 🚀 EMPIRE BUILDING (Market Booms & Opportunities)
+  { name: 'Profitable Niche Hunter', url: 'https://news.google.com/rss/search?q=when:30D+"profitable+niche"+OR+"market+opportunity"+OR+"booming+product"+successful+launch&hl=en-US&gl=US&ceid=US:en', label: 'BOOM', cat: 'biz-scaling' },
+  { name: 'Market Insight Radar', url: 'https://news.google.com/rss/search?q=when:7D+"what+people+are+looking+for"+market+trends+growth&hl=en-US&gl=US&ceid=US:en', label: 'INSIGHT', cat: 'biz-scaling' },
+  { name: 'Sequoia Capital Strategy', url: 'https://news.google.com/rss/search?q=when:30D+Sequoia+Capital+Scaling+Startup+Advice&hl=en-US&gl=US&ceid=US:en', label: 'EQUITY', cat: 'biz-scaling' },
+  { name: 'Venture Capital Trends', url: 'https://news.google.com/rss/search?q=when:7D+VC+Funding+Trends+AI+Market+Opportunity&hl=en-US&gl=US&ceid=US:en', label: 'VENTURE', cat: 'biz-scaling' },
+  { name: 'Entrepreneur Latest', url: 'https://www.entrepreneur.com/latest.rss', label: 'LAUNCH', cat: 'biz-scaling' },
+  
+  // 🧠 POWER & MINDSET (History & Psychological Dominance)
+  { name: 'Strategic Influence Radar', url: 'https://news.google.com/rss/search?q=when:30D+"Robert+Greene"+OR+"Influence"+OR+"Manipulation"+Psychology&hl=en-US&gl=US&ceid=US:en', label: 'POWER', cat: 'mindset' },
+  { name: 'Elite History Lessons', url: 'https://news.google.com/rss/search?q=when:30D+"history+lessons"+powerful+kings+warriors+winning&hl=en-US&gl=US&ceid=US:en', label: 'HISTORY', cat: 'mindset' },
+  { name: 'High-Performance Mind', url: 'https://fs.blog/feed/', label: 'STRATEGY', cat: 'mindset' },
+  { name: 'The Stoic Warrior', url: 'https://news.google.com/rss/search?q=when:30D+source:Daily_Stoic+OR+source:Ryan_Holiday+Elite+Mindset&hl=en-US&gl=US&ceid=US:en', label: 'LEGACY', cat: 'mindset' },
+  { name: 'Dark Psychology Mastery', url: 'https://news.google.com/rss/search?q=when:30D+"Social+Engineering"+OR+"Machiavellian"+Control&hl=en-US&gl=US&ceid=US:en', label: 'DOMINANCE', cat: 'mindset' },
+  { name: 'Ancient Wisdom Radar', url: 'https://news.google.com/rss/search?q=when:30D+"Sun+Tzu"+OR+"Marcus+Aurelius"+OR+"Seneca"+Lessons&hl=en-US&gl=US&ceid=US:en', label: 'ANCIENT', cat: 'mindset' },
+  
+  // 🛠️ THE TOOL BOX (First to Know: AI & Biz Tools)
+  { name: 'AI Tool Mastery Radar', url: 'https://news.google.com/rss/search?q=when:7D+NEW+best+AI+tools+Launch+Master+Tutorial&hl=en-US&gl=US&ceid=US:en', label: 'FIRST KNOW', cat: 'ai-toolbox' },
+  { name: 'AI Tool Hunt (Live PH)', url: 'https://news.google.com/rss/search?q=when:1D+source:Product_Hunt+AI+Tool+Launch&hl=en-US&gl=US&ceid=US:en', label: 'SaaS SNIPER', cat: 'ai-toolbox' },
+  { name: 'Exploding Topics (Live)', url: 'https://news.google.com/rss/search?q=when:7D+trending+products+consumer+market+growth&hl=en-US&gl=US&ceid=US:en', label: 'EXPLODING', cat: 'ai-toolbox' },
+  { name: 'Advanced AI Automation', url: 'https://news.google.com/rss/search?q=when:1D+AI+agent+automation+workflow+scale&hl=en-US&gl=US&ceid=US:en', label: 'AUTOMATION', cat: 'ai-toolbox' },
+  { name: 'Product Hunt Mastery', url: 'https://www.producthunt.com/feed', label: 'GLOBAL SNIPER', cat: 'ai-toolbox' }
+];
+
+const POWER_LAWS = [
+  "Never outshine the master.", "Conceal your intentions.", "Always say less than necessary.",
+  "Guard your reputation with your life.", "Court attention at all cost.", "Win through actions, never through argument.",
+  "Keep people dependent on you.", "Avoid the unhappy and unlucky.", "Use selective honesty to disarm your victim.",
+  "Master the art of timing.", "Strive to be different, but blend in with others.", "Never commit to anyone.",
+  "Thinking outside the box is the only way to scale an empire.",
+  "Speed is the ultimate advantage in a product market.",
+  "The goal is not to be the best. The goal is to be the only.",
+  "Complexity is your enemy. Any fool can make something complicated. It is hard to keep things simple.",
+  "Work for one hour a day on your empire, and in one year you will be unrecognizable.",
+  "A million seconds is 12 days. A billion seconds is 31 years. Protect your time.",
+  "Antifragility is beyond resilience or robustness. The resilient resists shocks. The antifragile gets better.",
+  "If you want to be successful, you must be willing to be misunderstood for a long period of time.",
+  "The happiness of your life depends upon the quality of your thoughts.",
+  "Focus on the process, and the outcome will take care of itself."
+];
+
+let allIntel = [];
+try {
+  const saved = localStorage.getItem('ELITE_ARCHIVE');
+  if (saved) allIntel = JSON.parse(saved);
+} catch(e) {}
+
+let activeFilter = 'all';
+
+async function fetchWithProxy(url) {
+  const shuffled = [...PROXIES].sort(() => Math.random() - 0.5);
+  for (const proxyFn of shuffled) {
+    try {
+      const liveUrl = `${url}${url.includes('?') ? '&' : '?'}cache=${Date.now()}`;
+      const res = await fetch(proxyFn(liveUrl), { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) continue;
+      const text = await res.text();
+      // Handle AllOrigins
+      if (text.trim().startsWith('{')) {
+        try { const json = JSON.parse(text); if (json.contents) return json.contents; } catch(e){}
+      }
+      if (text && text.length > 500) return text;
+    } catch(e) {}
+  }
+  return null;
+}
+
+async function fetchWithProxy(url) {
+  const shuffled = [...PROXIES].sort(() => Math.random() - 0.5);
+  for (const proxyFn of shuffled) {
+    try {
+      const liveUrl = `${url}${url.includes('?') ? '&' : '?'}v_elite_cache=${Date.now()}`;
+      const res = await fetch(proxyFn(liveUrl), { signal: AbortSignal.timeout(6000) });
+      if (!res.ok) continue;
+      const text = await res.text();
+      // Handle AllOrigins
+      if (text.trim().startsWith('{')) {
+        try { const json = JSON.parse(text); if (json.contents) return json.contents; } catch(e){}
+      }
+      if (text && text.length > 300) return text;
+    } catch(e) {}
+  }
+  return null;
+}
+
+async function fetchFeed(source) {
+  const raw = await fetchWithProxy(source.url);
+  if (!raw) throw new Error("Blocked");
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(raw, "text/xml");
+  const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 50); // DEEP INJECTION (Was 10)
+  return items.map(item => {
+    const title = item.querySelector('title')?.textContent || '';
+    const link = item.querySelector('link')?.textContent || item.querySelector('link')?.getAttribute('href') || '#';
+    const desc = item.querySelector('description, summary')?.textContent || '';
+    const date = item.querySelector('pubDate, published')?.textContent || new Date().toISOString();
+    return { title, link, desc: desc.replace(/<[^>]*>/g, '').slice(0, 180) + '...', date, label: source.label, cat: source.cat, source: source.name };
+  });
+}
+
+async function loadAllFeeds() {
+  const isInitialLoad = allIntel.length === 0;
+  if (isInitialLoad) {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('newsGrid').style.display = 'none';
+  }
+  
+  const satStatus = document.getElementById('satStatus');
+  satStatus.innerHTML = SOURCES.map(s => `
+    <div class="sat-item" id="sat-${s.label}">
+      <span class="sat-dot gray" id="dot-${s.label}"></span>
+      <span class="sat-name">${s.name}</span>
+    </div>
+  `).join('');
+
+  for (let s of SOURCES) {
+    const dot = document.getElementById(`dot-${s.label}`);
+    try {
+      await new Promise(r => setTimeout(r, 200 + Math.random() * 200));
+      const items = await fetchFeed(s);
+      
+      // UNIQUE INJECTION: Only add articles we don't already have
+      items.forEach(item => {
+        const exists = allIntel.some(existing => existing.link === item.link || (existing.title === item.title && existing.source === item.source));
+        if (!exists) {
+          const cat = scoreArticle(item, s.cat);
+          if (cat) {
+            item.cat = cat;
+            allIntel.unshift(item); // Add newest at the TOP
+          }
+        }
+      });
+      // PERMANENT PERSISTENCE
+      if (allIntel.length > 2000) allIntel = allIntel.slice(0, 2000);
+      localStorage.setItem('ELITE_ARCHIVE', JSON.stringify(allIntel));
+      if (dot) dot.className = 'sat-dot green';
+    } catch(e) {
+      if (dot) dot.className = 'sat-dot red';
+    }
+    document.getElementById('ticker').innerHTML = `● Establishing connection: ${s.name}... Active background scan...`;
+  }
+
+  // Final Sort & Render
+  allIntel.sort((a,b) => new Date(b.date) - new Date(a.date));
+  if (isInitialLoad) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('newsGrid').style.display = 'grid';
+  }
+  render();
+  updateMeta();
+}
+
+function scoreArticle(item, defaultCat) {
+  const content = (item.title + ' ' + item.desc).toLowerCase();
+  const SILOS = {
+    'ai-scale': ['ai agency','openai','llm','gpt','anthropic','claude','scaling ai','automate agency','prompt engineering','model training','agentic','autonomous agent','high ticket','deepmind','nlp','successful ai','industry news','scale playbook','agency success','startup success'],
+    'biz-scaling': ['scaling','revenue','series a','venture capital','entrepreneur','biz build','exit strategy','m&a','sales process','founder','venture debt','ipo','valuation','growth marketing','funding','startup','market fit','profitable niche','launch','built to last','boom','opportunity','trending product','market gap','vc trend','profitable business'],
+    'mindset': ['stoic','stoicism','marcus aurelius','mindset','power law','psychology','perform','strategy','power dynamic','philosophy','antifragile','skin in the game','taleb','nietzsche','discipline','zen','high performance','control','manipulate','influence','machiavelli','leadership','social dynamics','history lesson','king','conqueror','empire','winning strategy','ancient','gladiator','power dynamics'],
+    'ai-toolbox': ['best ai tools','new tool','saas launch','directory','plugin','extension','workflow','productivity tool','automation workflow','zapier','make.com','viral product','software','app','platform','utility','toolbox','library','resource','master','tutorial','benchmark','first to know','latest tool','product hunt','free tools']
+  };
+
+  for (let [cat, keys] of Object.entries(SILOS)) {
+    if (keys.some(k => content.includes(k))) return cat;
+  }
+  
+  // SOURCE-DOMINANT LOGIC: Trust the elite source category if keyword fails
+  if (defaultCat) return defaultCat;
+  
+  return null;
+}
+
+function render() {
+  const filtered = allIntel.filter(i => activeFilter === 'all' || i.cat === activeFilter);
+  document.getElementById('newsGrid').innerHTML = filtered.map(i => `
+    <article class="card" onclick="window.open('${i.link}')">
+      <div class="card-header" style="background:${getCatColor(i.cat)}"></div>
+      <div class="card-content">
+        <div class="card-meta"><span>${i.label}</span><span>${new Date(i.date).toLocaleDateString()}</span></div>
+        <h3 class="card-title">${i.title}</h3>
+        <p class="card-desc">${i.desc}</p>
+      </div>
+    </article>
+  `).join('');
+  document.getElementById('ticker').innerHTML = allIntel.slice(0,10).map(i => ` ● [${i.label}] ${i.title}`).join(' ');
+}
+
+function getCatColor(cat) {
+  switch(cat) {
+    case 'ai-scale': return 'var(--ai-blue)';
+    case 'biz-scaling': return 'var(--biz-green)';
+    case 'mindset': return 'var(--gold)';
+    case 'ai-toolbox': return 'var(--power-red)';
+    default: return 'var(--gold)';
+  }
+}
+
+function updateMeta() {
+  document.getElementById('count-all').innerText = allIntel.length;
+  document.getElementById('count-ai').innerText = allIntel.filter(i => i.cat === 'ai-scale').length;
+  document.getElementById('count-biz').innerText = allIntel.filter(i => i.cat === 'biz-scaling').length;
+  document.getElementById('count-mind').innerText = allIntel.filter(i => i.cat === 'mindset').length;
+  document.getElementById('count-tools').innerText = allIntel.filter(i => i.cat === 'ai-toolbox').length;
+  document.getElementById('dailyLaw').innerText = POWER_LAWS[Math.floor(Math.random()*POWER_LAWS.length)];
+}
+
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelector('.nav-item.active').classList.remove('active');
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    document.getElementById('viewTitle').innerText = btn.innerText.split('0')[0].trim();
+    render();
+  };
+});
+
+loadAllFeeds();
+setInterval(loadAllFeeds, 2 * 60 * 1000); // 2-Minute 'First to Know' heartbeat
+</script>
+</body>
+</html>
