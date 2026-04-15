@@ -244,7 +244,8 @@ async function fetchWithProxy(url) {
     try {
       const separator = url.includes('?') ? '&' : '?';
       const cacheBustedUrl = `${url}${separator}live_radar_v5=${Date.now()}`;
-      const res = await fetch(proxyFn(cacheBustedUrl), { signal: AbortSignal.timeout(6000) });
+      // Reduced timeout to 4000ms for faster fallback
+      const res = await fetch(proxyFn(cacheBustedUrl), { signal: AbortSignal.timeout(4000) });
       if (!res.ok) continue;
       const text = await res.text();
       if (text && text.length > 200) return text; 
@@ -278,22 +279,30 @@ async function loadAllFeeds(isInitial = false) {
   lastUpdated.innerHTML    = '<span class="radar-scan"></span> Background Sync Active...';
   lastUpdated.style.color    = '#0abfbc';
 
+  // Optimized: Parallel fetch for massive speed increase
+  // We use Promise.allSettled to ensure one failing source doesn't block the rest
+  const results = await Promise.allSettled(SOURCES.map(s => fetchFeed(s)));
+  
   let successCount = 0;
-  for (const s of SOURCES) {
-    try {
-      await new Promise(r => setTimeout(r, 150 + Math.random() * 150));
-      const res = await fetchFeed(s);
-      res.forEach(item => {
+  results.forEach((res, index) => {
+    const s = SOURCES[index];
+    if (res.status === 'fulfilled') {
+      const feedItems = res.value;
+      feedItems.forEach(item => {
         const exists = allArticles.some(ex => ex.link === item.link || (ex.title === item.title && ex.source === item.source));
         if (!exists) {
           const score = scoreArticle(item, s.cat);
-          Object.assign(item, score); // Merge category, isUAE, priority, score
+          Object.assign(item, score); 
           allArticles.unshift(item);
         }
       });
       successCount++;
-    } catch (e) { console.warn(`Failed: ${s.name}`, e); }
-  }
+      sourceStatuses[s.name] = 'online';
+    } else {
+      console.warn(`Failed: ${s.name}`, res.reason);
+      sourceStatuses[s.name] = 'error';
+    }
+  });
 
   allArticles = allArticles.slice(0, 2000);
   saveToStorage();
